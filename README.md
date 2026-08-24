@@ -1,16 +1,25 @@
-# QwarraOS
+# RayBee OS (Girlfriend Edition)
 
-A personal sibling memory operating system for Qwarra, made by Ray.
+A personalized romantic memory operating system created by Ray for Bee. Inspired by Qwarra OS and featuring interactive visual novel story mode, love coupons, chat simulator, custom music radio, dessert mini-game, secret letters, and cute floating mascot.
 
-## Open QwarraOS
+## Open RayBee OS
 
-**Live site:** https://rayfrank.github.io/QWAARRAA_OS/
+- **Live site:** Open `index.html` in any web browser!
+- The app is completely self-contained with zero external audio/CSS framework dependencies. Internet access is not required.
 
-The site is a single self-contained HTML experience. Internet access is only needed for the Spotify player and external links.
+## Features
 
-## Printable QR
+- 🐝 **Honeyed Memories**: Interactive Visual Novel engine starring Ray & Bee with branching story choices and endings.
+- 💬 **RayBee Signal**: Encrypted chat simulator between Ray & Bee with auto-reply system.
+- 💌 **Honey Vault**: Secret letters and interactive flip card deck of 20+ reasons why I love you.
+- 🎟️ **Love Coupons**: Redeemable voucher cards for massages, boba dates, movie picks, and instant win argument cards.
+- 📻 **Honey Beats**: Web Audio synthesized lofi love beats radio and music player.
+- 🧁 **Dessert Cafe**: Interactive boba tea creation mini-game.
+- 📸 **Polaroid Gallery**: Photo vault of memorable moments.
+- 💻 **Bee Terminal**: Retro CLI with secret commands, kiss generator, and love stats.
+- 🔒 **Lock Screen**: Passcode protected lock screen (Default PIN: `1204`).
+- 🎨 **Wallpaper Switcher**: Multiple animated glassmorphism romantic themes.
 
-- `printable-qr.html` opens the A4 print layout in a browser.
-- `QwarraOS-printable-QR.pdf` is ready for A4 printing.
-- `qr/qwarra-os-qr.svg` is the vector QR master.
-- `qr/qwarra-os-qr.png` is the high-resolution raster version.
+## Printable Access Pass
+
+- `printable-qr.html` contains the printable character access pass.
