@@ -1,0 +1,1058 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1218">
+  <title>RayBee OS | Girlfriend Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #f5b041;
+      --gold-dark: #d68910;
+      --honey: #f39c12;
+      --pink: #ff6b81;
+      --pink-deep: #e84393;
+      --rose: #f8a5c2;
+      --rose-light: #fff0f5;
+      --mint: #78e08f;
+      --lilac: #a29bfe;
+      --cream: #fffaf0;
+      --shell: #1a1218;
+      --shell-surface: #261b24;
+      --shell-glass: rgba(38, 27, 36, 0.75);
+      --line: rgba(255, 255, 255, 0.15);
+      --glass-line: rgba(255, 215, 0, 0.3);
+      --glass-light: rgba(255, 250, 240, 0.85);
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 5px 15px rgba(232, 67, 147, 0.15);
+      --taskbar-h: 62px;
+      --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-fun: 'Fredoka', cursive, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; letter-spacing: 0; user-select: none; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--shell); font-family: var(--font-sans); color: #fff; }
+
+    /* Canvas background */
+    #bgCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    /* Wallpaper Themes */
+    .wallpaper-sunset { background: radial-gradient(circle at 20% 20%, #4a1942 0%, #1a1218 70%), linear-gradient(135deg, #2b1055 0%, #7597de 100%); }
+    .wallpaper-rose { background: radial-gradient(circle at 80% 30%, #5e1d38 0%, #170d14 75%); }
+    .wallpaper-night { background: radial-gradient(circle at 50% 10%, #1e272e 0%, #0f1419 80%); }
+    .wallpaper-honey { background: radial-gradient(circle at 30% 70%, #513606 0%, #1f1505 80%); }
+
+    /* Common Buttons & Focus */
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; border: none; background: none; transition: all 0.2s ease; }
+    button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+
+    /* Boot Screen */
+    .boot-screen {
+      position: fixed; inset: 0; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: #120b11; color: var(--cream); transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    .boot-screen.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .boot-logo-mark {
+      width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--pink));
+      display: grid; place-items: center; font-size: 50px; box-shadow: 0 0 40px rgba(245, 176, 65, 0.4);
+      animation: pulse-logo 2s infinite ease-in-out; margin-bottom: 24px;
+    }
+    @keyframes pulse-logo { 0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(245, 176, 65, 0.3); } 50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(255, 107, 129, 0.6); } }
+    .boot-title { font-family: var(--font-fun); font-size: 38px; font-weight: 700; color: #fff; text-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    .boot-subtitle { font-size: 16px; color: var(--rose); margin-top: 6px; margin-bottom: 30px; letter-spacing: 1px; }
+    .boot-bar-track { width: 240px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; position: relative; }
+    .boot-bar-fill { position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), var(--pink)); transition: width 0.3s ease; }
+    .boot-status { margin-top: 14px; font-size: 13px; color: rgba(255,255,255,0.6); font-family: var(--font-mono); }
+
+    /* Lock Screen */
+    .lock-screen {
+      position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(18, 11, 17, 0.88); backdrop-filter: blur(25px); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+    }
+    .lock-screen.unlocked { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+    .lock-avatar { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--gold); overflow: hidden; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .lock-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .lock-user { font-family: var(--font-fun); font-size: 28px; font-weight: 700; color: var(--cream); margin-bottom: 4px; }
+    .lock-hint { font-size: 14px; color: var(--rose); margin-bottom: 24px; }
+    .pin-display { display: flex; gap: 12px; margin-bottom: 24px; }
+    .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--gold); transition: all 0.2s ease; }
+    .pin-dot.filled { background: var(--pink); border-color: var(--pink); box-shadow: 0 0 12px var(--pink); }
+    .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 240px; }
+    .pin-btn {
+      width: 65px; height: 65px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 22px; font-weight: 600; color: #fff; display: grid; place-items: center; transition: all 0.15s ease;
+    }
+    .pin-btn:hover { background: rgba(245, 176, 65, 0.25); border-color: var(--gold); transform: scale(1.05); }
+    .pin-btn:active { transform: scale(0.95); }
+    .unlock-btn {
+      margin-top: 24px; padding: 12px 32px; border-radius: 30px; background: linear-gradient(135deg, var(--gold), var(--pink));
+      color: #fff; font-weight: 700; font-size: 16px; box-shadow: 0 8px 25px rgba(245, 176, 65, 0.4); display: flex; align-items: center; gap: 8px;
+    }
+    .unlock-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255, 107, 129, 0.5); }
+
+    /* Desktop Area */
+    .desktop { position: relative; width: 100%; height: calc(100% - var(--taskbar-h)); z-index: 1; padding: 20px; overflow: hidden; }
+
+    /* Desktop Icons Grid */
+    .desktop-icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); grid-auto-rows: 110px; gap: 16px; width: min(420px, 100%); }
+    .desktop-icon-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 10px; border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03); border: 1px solid transparent; transition: all 0.2s ease; cursor: pointer;
+    }
+    .desktop-icon-btn:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 215, 0, 0.4); transform: translateY(-4px); }
+    .desktop-icon-img {
+      width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; font-size: 28px;
+      background: var(--icon-bg, linear-gradient(135deg, #ff9a9e, #fecfef)); box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+    .desktop-icon-label { font-size: 13px; font-weight: 600; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); text-align: center; line-height: 1.2; }
+
+    /* Floating Desktop Widgets */
+    .desktop-widgets { position: absolute; right: 24px; top: 24px; display: flex; flex-direction: column; gap: 16px; width: 300px; pointer-events: auto; }
+    .widget-card {
+      background: rgba(38, 27, 36, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px; padding: 18px; box-shadow: var(--shadow); transition: transform 0.2s ease;
+    }
+    .widget-card:hover { border-color: rgba(245, 176, 65, 0.4); transform: translateY(-2px); }
+    .widget-title { font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--gold); letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+    .love-timer-display { font-family: var(--font-fun); font-size: 22px; font-weight: 700; color: var(--cream); text-align: center; margin: 6px 0; }
+    .love-timer-sub { font-size: 12px; color: var(--rose); text-align: center; }
+    .affirmation-text { font-family: var(--font-serif); font-size: 15px; font-style: italic; color: var(--cream); line-height: 1.4; }
+
+    /* Floating Bee Mascot ("Buzz") */
+    .bee-mascot {
+      position: absolute; bottom: 30px; right: 40px; width: 75px; height: 75px; cursor: pointer; z-index: 10;
+      animation: float-bee 3s ease-in-out infinite; transition: transform 0.2s ease;
+    }
+    .bee-mascot:hover { transform: scale(1.15) rotate(10deg); }
+    @keyframes float-bee { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+    .bee-bubble {
+      position: absolute; bottom: 85px; right: 0; width: 220px; padding: 12px 16px; border-radius: 16px;
+      background: var(--gold); color: #261b24; font-weight: 700; font-size: 13px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.3s ease; pointer-events: none;
+    }
+    .bee-bubble::after { content: ""; position: absolute; bottom: -8px; right: 30px; border-width: 8px 8px 0; border-style: solid; border-color: var(--gold) transparent; }
+    .bee-bubble.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+    /* App Window Framework */
+    .app-window {
+      position: absolute; z-index: 100; display: flex; flex-direction: column;
+      width: min(var(--window-w, 780px), calc(100vw - 32px)); height: min(var(--window-h, 560px), calc(100vh - var(--taskbar-h) - 40px));
+      left: var(--window-x, 50%); top: var(--window-y, 45%); transform: translate(-50%, -50%) scale(0.95);
+      background: rgba(30, 20, 28, 0.92); backdrop-filter: blur(20px); border: 1px solid var(--glass-line);
+      border-radius: 20px; box-shadow: var(--shadow); opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
+    }
+    .app-window.is-open { opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .app-window.is-active { z-index: 500; border-color: var(--gold); box-shadow: 0 25px 60px rgba(245, 176, 65, 0.25); }
+    .app-window.is-minimized { opacity: 0; pointer-events: none; transform: translate(-50%, 40px) scale(0.8); }
+    .app-window.is-maximized { width: calc(100vw - 32px) !important; height: calc(100vh - var(--taskbar-h) - 32px) !important; left: 50% !important; top: calc((100vh - var(--taskbar-h)) / 2) !important; }
+
+    /* Window Header / Titlebar */
+    .window-titlebar {
+      display: flex; align-items: center; justify-content: space-between; padding: 12px 18px;
+      background: rgba(255, 255, 255, 0.04); border-bottom: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px 20px 0 0; cursor: move;
+    }
+    .window-title { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; color: var(--cream); }
+    .window-controls { display: flex; align-items: center; gap: 8px; }
+    .win-btn { width: 14px; height: 14px; border-radius: 50%; transition: transform 0.15s ease; }
+    .win-btn:hover { transform: scale(1.2); }
+    .win-btn.close { background: #ff5f56; }
+    .win-btn.minimize { background: #ffbd2e; }
+    .win-btn.maximize { background: #27c93f; }
+
+    /* Window Content Body */
+    .window-body { flex: 1; overflow: auto; padding: 20px; position: relative; }
+
+    /* Window 1: Visual Novel (Honeyed Memories) */
+    .vn-container { position: absolute; inset: 0; display: flex; flex-direction: column; background: #000; overflow: hidden; }
+    .vn-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: background-image 0.5s ease; filter: brightness(0.85); }
+    .vn-characters { position: absolute; inset: 0; display: flex; justify-content: space-around; align-items: flex-end; padding-bottom: 140px; pointer-events: none; }
+    .vn-char { height: 75%; max-width: 40%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6)); transition: all 0.3s ease; }
+    .vn-char.speaker { transform: scale(1.05); filter: drop-shadow(0 0 25px var(--gold)); }
+    .vn-box {
+      position: absolute; bottom: 16px; left: 16px; right: 16px; padding: 20px 24px; border-radius: 18px;
+      background: rgba(20, 12, 18, 0.88); backdrop-filter: blur(15px); border: 2px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+    .vn-name { font-family: var(--font-fun); font-size: 18px; font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+    .vn-text { font-size: 16px; line-height: 1.5; color: #fff; min-height: 48px; }
+    .vn-choices { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(0,0,0,0.6); z-index: 10; }
+    .vn-choice-btn {
+      width: min(450px, 85%); padding: 14px 24px; border-radius: 30px; background: linear-gradient(135deg, var(--gold), var(--pink));
+      color: #fff; font-weight: 700; font-size: 15px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.4); transition: transform 0.2s ease;
+    }
+    .vn-choice-btn:hover { transform: scale(1.04); }
+
+    /* Window 2: RayBee Signal Chat */
+    .chat-layout { display: flex; height: 100%; gap: 16px; }
+    .chat-sidebar { width: 220px; background: rgba(0,0,0,0.2); border-radius: 14px; padding: 12px; }
+    .chat-contact { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 12px; background: rgba(245,176,65,0.15); border: 1px solid var(--gold); }
+    .chat-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--pink); display: grid; place-items: center; font-size: 22px; }
+    .chat-main { flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.25); border-radius: 14px; overflow: hidden; }
+    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    .chat-msg { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; word-break: break-word; }
+    .chat-msg.sent { align-self: flex-end; background: linear-gradient(135deg, var(--gold-dark), var(--pink-deep)); color: #fff; border-bottom-right-radius: 4px; }
+    .chat-msg.received { align-self: flex-start; background: rgba(255,255,255,0.12); color: #fff; border-bottom-left-radius: 4px; }
+    .chat-input-bar { display: flex; gap: 10px; padding: 12px; background: rgba(0,0,0,0.3); }
+    .chat-input { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 10px 16px; outline: none; }
+    .chat-send-btn { padding: 10px 20px; border-radius: 20px; background: var(--pink); font-weight: 700; color: #fff; }
+
+    /* Window 3: Honey Vault Notes */
+    .notes-tabs { display: flex; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+    .note-tab-btn { padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.05); font-weight: 600; font-size: 13px; }
+    .note-tab-btn.active { background: var(--gold); color: #261b24; }
+    .reasons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+    .reason-card {
+      height: 120px; border-radius: 14px; background: linear-gradient(135deg, rgba(255,107,129,0.2), rgba(245,176,65,0.2));
+      border: 1px solid rgba(255,255,255,0.15); padding: 14px; display: grid; place-items: center; text-align: center;
+      font-family: var(--font-serif); font-size: 14px; cursor: pointer; transition: transform 0.2s ease;
+    }
+    .reason-card:hover { transform: translateY(-4px); border-color: var(--gold); }
+
+    /* Window 4: Love Coupons */
+    .coupons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .coupon-card {
+      border-radius: 18px; background: linear-gradient(135deg, #2b1828, #3b2234); border: 2px dashed var(--gold);
+      padding: 16px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;
+    }
+    .coupon-card.redeemed { opacity: 0.6; filter: grayscale(0.5); }
+    .coupon-stamp {
+      position: absolute; top: 30%; right: 10%; transform: rotate(-20deg); border: 3px solid #ff5f56; color: #ff5f56;
+      font-family: var(--font-fun); font-weight: 700; font-size: 22px; padding: 4px 12px; border-radius: 8px; display: none;
+    }
+    .coupon-card.redeemed .coupon-stamp { display: block; }
+    .coupon-icon { font-size: 32px; margin-bottom: 8px; }
+    .coupon-title { font-family: var(--font-fun); font-size: 16px; color: var(--gold); margin-bottom: 4px; }
+    .coupon-desc { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 14px; }
+    .redeem-btn { padding: 8px 16px; border-radius: 12px; background: var(--pink); font-weight: 700; font-size: 13px; color: #fff; }
+
+    /* Window 5: Honey Beats Radio */
+    .radio-container { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; text-align: center; height: 100%; }
+    .turntable {
+      width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, #333 30%, #111 70%);
+      border: 4px solid var(--gold); display: grid; place-items: center; box-shadow: 0 0 30px rgba(0,0,0,0.6);
+    }
+    .turntable.playing { animation: spin 4s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .turntable-center { width: 50px; height: 50px; border-radius: 50%; background: var(--pink); font-size: 24px; display: grid; place-items: center; }
+    .radio-controls { display: flex; gap: 16px; align-items: center; }
+    .radio-btn { width: 48px; height: 48px; border-radius: 50%; background: var(--gold); color: #261b24; font-size: 20px; display: grid; place-items: center; font-weight: 700; }
+
+    /* Window 6: Dessert Cafe Mini-Game */
+    .cafe-container { display: flex; flex-direction: column; gap: 16px; height: 100%; }
+    .cafe-order-box { background: rgba(245,176,65,0.15); border: 1px solid var(--gold); border-radius: 14px; padding: 14px; font-weight: 600; }
+    .cup-preview { width: 100px; height: 140px; border: 3px solid #fff; border-radius: 0 0 20px 20px; margin: 0 auto; position: relative; overflow: hidden; background: rgba(255,255,255,0.1); }
+    .cup-fill { position: absolute; bottom: 0; left: 0; right: 0; height: 0%; background: var(--gold); transition: height 0.3s ease; }
+    .ingredient-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .ing-btn { padding: 10px 16px; border-radius: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); font-weight: 600; }
+
+    /* Window 7: Polaroid Gallery */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+    .polaroid { background: #fff; padding: 10px 10px 24px; border-radius: 6px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); transform: rotate(calc(-3deg + 6deg * var(--r, 0.5))); transition: transform 0.2s ease; cursor: pointer; }
+    .polaroid:hover { transform: scale(1.05) rotate(0deg); z-index: 5; }
+    .polaroid-img { width: 100%; height: 150px; object-fit: cover; border-radius: 4px; background: #eee; }
+    .polaroid-caption { font-family: var(--font-serif); color: #333; font-size: 13px; font-weight: 600; text-align: center; margin-top: 10px; }
+
+    /* Window 8: Bee Terminal */
+    .terminal-box { background: #0c080b; border-radius: 12px; padding: 16px; height: 100%; font-family: var(--font-mono); font-size: 13px; color: var(--gold); overflow-y: auto; }
+    .term-line { margin-bottom: 6px; }
+    .term-input-line { display: flex; gap: 8px; }
+    .term-input { background: none; border: none; outline: none; color: #fff; font-family: var(--font-mono); flex: 1; }
+
+    /* Taskbar Bottom Bar */
+    .taskbar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: var(--taskbar-h); z-index: 9000;
+      background: rgba(26, 18, 24, 0.85); backdrop-filter: blur(20px); border-top: 1px solid var(--glass-line);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    }
+    .start-btn {
+      display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-radius: 30px;
+      background: linear-gradient(135deg, var(--gold), var(--pink)); color: #fff; font-weight: 700; font-size: 15px; box-shadow: 0 4px 15px rgba(245,176,65,0.3);
+    }
+    .start-btn:hover { transform: scale(1.04); }
+    .taskbar-items { display: flex; gap: 8px; flex: 1; margin: 0 16px; overflow-x: auto; }
+    .taskbar-item {
+      display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 12px;
+      background: rgba(255,255,255,0.06); border: 1px solid transparent; font-size: 13px; font-weight: 600; white-space: nowrap;
+    }
+    .taskbar-item.active { background: rgba(245,176,65,0.2); border-color: var(--gold); color: var(--gold); }
+    .sys-tray { display: flex; align-items: center; gap: 16px; font-size: 13px; font-weight: 600; color: var(--cream); }
+
+    /* Start Menu Drawer */
+    .start-menu {
+      position: fixed; bottom: calc(var(--taskbar-h) + 12px); left: 16px; width: 340px; z-index: 9500;
+      background: rgba(30, 20, 28, 0.95); backdrop-filter: blur(25px); border: 1px solid var(--glass-line);
+      border-radius: 24px; padding: 20px; box-shadow: var(--shadow); opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.25s ease;
+    }
+    .start-menu.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .profile-card { display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+    .profile-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--pink)); display: grid; place-items: center; font-size: 24px; }
+    .profile-name { font-family: var(--font-fun); font-size: 18px; font-weight: 700; color: var(--cream); }
+    .profile-status { font-size: 12px; color: var(--rose); }
+
+    /* Responsive Touch Optimizations */
+    @media (max-width: 768px) {
+      .desktop-widgets { display: none; }
+      .desktop-icons { grid-template-columns: repeat(3, 1fr); width: 100%; }
+      .app-window { width: calc(100vw - 16px) !important; height: calc(100vh - var(--taskbar-h) - 20px) !important; left: 50% !important; top: calc((100vh - var(--taskbar-h)) / 2) !important; }
+    }
+  </style>
+</head>
+<body class="wallpaper-sunset">
+
+  <!-- Background Particle Canvas -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Boot Screen -->
+  <div class="boot-screen" id="bootScreen">
+    <div class="boot-logo-mark">🐝</div>
+    <div class="boot-title">RayBee OS</div>
+    <div class="boot-subtitle">Girlfriend Edition v1.0</div>
+    <div class="boot-bar-track"><div class="boot-bar-fill" id="bootFill"></div></div>
+    <div class="boot-status" id="bootStatus">Initializing love modules...</div>
+  </div>
+
+  <!-- Lock Screen -->
+  <div class="lock-screen" id="lockScreen">
+    <div class="lock-avatar"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23ff6b81'/><text x='50' y='65' font-size='45' text-anchor='middle'>👑</text></svg>" alt="Bee"></div>
+    <div class="lock-user">Welcome Back, Bee 💖</div>
+    <div class="lock-hint">Enter Passcode (Hint: 1204 or Anniversary)</div>
+    <div class="pin-display">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-btn" onclick="pressPin('1')">1</button>
+      <button class="pin-btn" onclick="pressPin('2')">2</button>
+      <button class="pin-btn" onclick="pressPin('3')">3</button>
+      <button class="pin-btn" onclick="pressPin('4')">4</button>
+      <button class="pin-btn" onclick="pressPin('5')">5</button>
+      <button class="pin-btn" onclick="pressPin('6')">6</button>
+      <button class="pin-btn" onclick="pressPin('7')">7</button>
+      <button class="pin-btn" onclick="pressPin('8')">8</button>
+      <button class="pin-btn" onclick="pressPin('9')">9</button>
+      <button class="pin-btn" onclick="pressPin('C')">C</button>
+      <button class="pin-btn" onclick="pressPin('0')">0</button>
+      <button class="pin-btn" onclick="pressPin('←')">←</button>
+    </div>
+    <button class="unlock-btn" onclick="unlockHeart()"><span>Unlock My Heart</span> 💖</button>
+  </div>
+
+  <!-- Desktop Area -->
+  <main class="desktop">
+    
+    <!-- Desktop Icons Grid -->
+    <nav class="desktop-icons">
+      <button class="desktop-icon-btn" onclick="openApp('vn')">
+        <div class="desktop-icon-img" style="--icon-bg: linear-gradient(135deg, #ff758c, #ff7eb3)">🐝</div>
+        <span class="desktop-icon-label">Honeyed Memories</span>
+      </button>
+
+      <button class="desktop-icon-btn" onclick="openApp('signal')">
+        <div class="desktop-icon-img" style="--icon-bg: linear-gradient(135deg, #4facfe, #00f2fe)">💬</div>
+        <span class="desktop-icon-label">RayBee Signal</span>
+      </button>
+
+      <button class="desktop-icon-btn" onclick="openApp('notes')">
+        <div class="desktop-icon-img" style="--icon-bg: linear-gradient(135deg, #f093fb, #f5576c)">💌</div>
+        <span class="desktop-icon-label">Honey Vault</span>
+      </button>
+
+      <button class="desktop-icon-btn" onclick="openApp('care')">
+        <div class="desktop-icon-img" style="--icon-bg: linear-gradient(135deg, #43e97b, #38f9d7)">🎟️</div>
+        <span class="desktop-icon-label">Love Coupons</span>
+      </button>
+
+      <button class="desktop-icon-btn" onclick="openApp('radio')">
+        <div class="desktop-icon-img" style="--icon-bg: linear-gradient(135deg, #fa709a, #fee140)">📻</div>
+        <span class="desktop-icon-label">Honey Beats</span>
+      </button>
+
+      <button class="desktop-icon-btn" onclick="openApp('lotus')">
+        <div class="desktop-icon-img" style="--icon-bg: linear-gradient(135deg, #ff9a9e, #fecfef)">🧁</div>
+        <span class="desktop-icon-label">Dessert Cafe</span>
+      </button>
+
+      <button class="desktop-icon-btn" onclick="openApp('gallery')">
+        <div class="desktop-icon-img" style="--icon-bg: linear-gradient(135deg, #a18cd1, #fbc2eb)">📸</div>
+        <span class="desktop-icon-label">Polaroid Gallery</span>
+      </button>
+
+      <button class="desktop-icon-btn" onclick="openApp('terminal')">
+        <div class="desktop-icon-img" style="--icon-bg: linear-gradient(135deg, #30cfd0, #330867)">💻</div>
+        <span class="desktop-icon-label">Bee Terminal</span>
+      </button>
+    </nav>
+
+    <!-- Desktop Widgets -->
+    <aside class="desktop-widgets">
+      <div class="widget-card">
+        <div class="widget-title"><span>Love Days Counter</span> 💖</div>
+        <div class="love-timer-display" id="loveTimer">000d 00h 00m</div>
+        <div class="love-timer-sub">Together Forever & Always</div>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-title"><span>Daily Love Note</span> 💌</div>
+        <div class="affirmation-text" id="dailyAffirmation">"You make every single day sweeter than honey."</div>
+      </div>
+    </aside>
+
+    <!-- Floating Mascot Buzz -->
+    <div class="bee-mascot" id="buzzMascot" onclick="buzzClick()">
+      <div class="bee-bubble" id="buzzBubble">Hi Bee! Ray loves you 3000! 🍯💖</div>
+      <svg viewBox="0 0 100 100" width="75" height="75">
+        <ellipse cx="50" cy="50" rx="30" ry="22" fill="#f5b041"/>
+        <path d="M40 30 L40 70 M55 30 L55 70" stroke="#261b24" stroke-width="6"/>
+        <circle cx="30" cy="45" r="4" fill="#261b24"/>
+        <ellipse cx="40" cy="25" rx="12" ry="18" fill="rgba(255,255,255,0.7)" transform="rotate(-20 40 25)"/>
+        <ellipse cx="55" cy="25" rx="12" ry="18" fill="rgba(255,255,255,0.7)" transform="rotate(20 55 25)"/>
+      </svg>
+    </div>
+
+    <!-- WINDOW 1: Visual Novel (Honeyed Memories) -->
+    <section class="app-window" id="win-vn">
+      <header class="window-titlebar">
+        <div class="window-title"><span>🐝</span> Ray & Bee: Honeyed Memories</div>
+        <div class="window-controls">
+          <button class="win-btn minimize" onclick="minimizeApp('vn')"></button>
+          <button class="win-btn maximize" onclick="toggleMaximize('vn')"></button>
+          <button class="win-btn close" onclick="closeApp('vn')"></button>
+        </div>
+      </header>
+      <div class="window-body" style="padding:0;">
+        <div class="vn-container">
+          <div class="vn-bg" id="vnBg" style="background-image: linear-gradient(to bottom, #2c3e50, #000);"></div>
+          <div class="vn-characters">
+            <div class="vn-char speaker" id="vnCharRay">👦</div>
+            <div class="vn-char" id="vnCharBee">👧</div>
+          </div>
+          <div class="vn-choices" id="vnChoices" style="display:none;"></div>
+          <div class="vn-box" onclick="nextVnDialogue()">
+            <div class="vn-name" id="vnName">Ray</div>
+            <div class="vn-text" id="vnText">Loading story...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WINDOW 2: RayBee Signal Chat -->
+    <section class="app-window" id="win-signal" style="--window-w:750px; --window-h:520px;">
+      <header class="window-titlebar">
+        <div class="window-title"><span>💬</span> RayBee Signal Messenger</div>
+        <div class="window-controls">
+          <button class="win-btn minimize" onclick="minimizeApp('signal')"></button>
+          <button class="win-btn maximize" onclick="toggleMaximize('signal')"></button>
+          <button class="win-btn close" onclick="closeApp('signal')"></button>
+        </div>
+      </header>
+      <div class="window-body">
+        <div class="chat-layout">
+          <div class="chat-sidebar">
+            <div class="chat-contact">
+              <div class="chat-avatar">👦</div>
+              <div>
+                <div style="font-weight:700;">Ray 💖</div>
+                <div style="font-size:11px; color:var(--mint);">Online</div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-main">
+            <div class="chat-messages" id="chatMsgs">
+              <div class="chat-msg received">Hey Bee! I made this entire OS just for you! 💖</div>
+              <div class="chat-msg received">Try clicking around and testing all the apps!</div>
+            </div>
+            <div class="chat-input-bar">
+              <input class="chat-input" id="chatInput" placeholder="Type a message to Ray..." onkeypress="handleChatKey(event)">
+              <button class="chat-send-btn" onclick="sendChatMessage()">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WINDOW 3: Honey Vault -->
+    <section class="app-window" id="win-notes" style="--window-w:700px; --window-h:500px;">
+      <header class="window-titlebar">
+        <div class="window-title"><span>💌</span> Honey Vault (Letters & Reasons)</div>
+        <div class="window-controls">
+          <button class="win-btn minimize" onclick="minimizeApp('notes')"></button>
+          <button class="win-btn maximize" onclick="toggleMaximize('notes')"></button>
+          <button class="win-btn close" onclick="closeApp('notes')"></button>
+        </div>
+      </header>
+      <div class="window-body">
+        <div class="notes-tabs">
+          <button class="note-tab-btn active" onclick="switchNoteTab('reasons')">20+ Reasons I Love You</button>
+          <button class="note-tab-btn" onclick="switchNoteTab('letters')">Secret Letters</button>
+        </div>
+        <div id="reasonsGrid" class="reasons-grid"></div>
+        <div id="lettersView" style="display:none; line-height:1.6;">
+          <h3 style="color:var(--gold); margin-bottom:10px;">Letter #1: Open When You Miss Me</h3>
+          <p>Dearest Bee,<br>Whenever you miss me, just open this OS. I put my heart into building every line of code here so you always feel close to me. You are my home, my happiness, and my favorite person forever.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WINDOW 4: Love Coupons -->
+    <section class="app-window" id="win-care" style="--window-w:780px; --window-h:540px;">
+      <header class="window-titlebar">
+        <div class="window-title"><span>🎟️</span> Love Coupons & Vouchers</div>
+        <div class="window-controls">
+          <button class="win-btn minimize" onclick="minimizeApp('care')"></button>
+          <button class="win-btn maximize" onclick="toggleMaximize('care')"></button>
+          <button class="win-btn close" onclick="closeApp('care')"></button>
+        </div>
+      </header>
+      <div class="window-body">
+        <div class="coupons-grid" id="couponsGrid"></div>
+      </div>
+    </section>
+
+    <!-- WINDOW 5: Honey Beats Radio -->
+    <section class="app-window" id="win-radio" style="--window-w:600px; --window-h:460px;">
+      <header class="window-titlebar">
+        <div class="window-title"><span>📻</span> Honey Beats Lofi Radio</div>
+        <div class="window-controls">
+          <button class="win-btn minimize" onclick="minimizeApp('radio')"></button>
+          <button class="win-btn maximize" onclick="toggleMaximize('radio')"></button>
+          <button class="win-btn close" onclick="closeApp('radio')"></button>
+        </div>
+      </header>
+      <div class="window-body">
+        <div class="radio-container">
+          <div class="turntable" id="turntable"><div class="turntable-center">🎵</div></div>
+          <div>
+            <h3 id="radioTrackTitle" style="color:var(--gold);">Honey Lofi Love Beats #1</h3>
+            <p style="font-size:13px; color:rgba(255,255,255,0.6);">Synthesized Chill Chords</p>
+          </div>
+          <div class="radio-controls">
+            <button class="radio-btn" onclick="toggleRadioPlay()" id="radioPlayBtn">▶</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WINDOW 6: Dessert Cafe -->
+    <section class="app-window" id="win-lotus" style="--window-w:650px; --window-h:500px;">
+      <header class="window-titlebar">
+        <div class="window-title"><span>🧁</span> Honey Dessert Cafe</div>
+        <div class="window-controls">
+          <button class="win-btn minimize" onclick="minimizeApp('lotus')"></button>
+          <button class="win-btn maximize" onclick="toggleMaximize('lotus')"></button>
+          <button class="win-btn close" onclick="closeApp('lotus')"></button>
+        </div>
+      </header>
+      <div class="window-body">
+        <div class="cafe-container">
+          <div class="cafe-order-box" id="cafeOrder">Order: Make a Honey Milk Tea with Boba! 🧋</div>
+          <div class="cup-preview">
+            <div class="cup-fill" id="cupFill"></div>
+          </div>
+          <div class="ingredient-btns">
+            <button class="ing-btn" onclick="addIngredient('Tea Base', '#d68910', 33)">🧋 Milk Tea</button>
+            <button class="ing-btn" onclick="addIngredient('Honey Syrup', '#f5b041', 66)">🍯 Honey</button>
+            <button class="ing-btn" onclick="addIngredient('Boba Pearls', '#333', 100)">⚫ Boba Pearls</button>
+            <button class="ing-btn" onclick="serveDrink()" style="background:var(--pink);">Serve Drink! ✨</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WINDOW 7: Polaroid Gallery -->
+    <section class="app-window" id="win-gallery" style="--window-w:750px; --window-h:520px;">
+      <header class="window-titlebar">
+        <div class="window-title"><span>📸</span> Polaroid Memories Vault</div>
+        <div class="window-controls">
+          <button class="win-btn minimize" onclick="minimizeApp('gallery')"></button>
+          <button class="win-btn maximize" onclick="toggleMaximize('gallery')"></button>
+          <button class="win-btn close" onclick="closeApp('gallery')"></button>
+        </div>
+      </header>
+      <div class="window-body">
+        <div class="gallery-grid" id="galleryGrid"></div>
+      </div>
+    </section>
+
+    <!-- WINDOW 8: Bee Terminal -->
+    <section class="app-window" id="win-terminal" style="--window-w:620px; --window-h:420px;">
+      <header class="window-titlebar">
+        <div class="window-title"><span>💻</span> Bee Terminal (bee@ray:~)</div>
+        <div class="window-controls">
+          <button class="win-btn minimize" onclick="minimizeApp('terminal')"></button>
+          <button class="win-btn maximize" onclick="toggleMaximize('terminal')"></button>
+          <button class="win-btn close" onclick="closeApp('terminal')"></button>
+        </div>
+      </header>
+      <div class="window-body" style="padding:0;">
+        <div class="terminal-box" id="termOutput">
+          <div class="term-line">RayBee Kernel 1.0 (x86_64-love)</div>
+          <div class="term-line">Type 'help' to see list of cute commands.</div>
+          <div class="term-input-line">
+            <span>bee@ray:~$</span>
+            <input class="term-input" id="termInput" onkeypress="handleTermKey(event)">
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Start Menu -->
+  <div class="start-menu" id="startMenu">
+    <div class="profile-card">
+      <div class="profile-avatar">🐝</div>
+      <div>
+        <div class="profile-name">Ray & Bee</div>
+        <div class="profile-status">Forever & Always 💖</div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="desktop-icon-btn" onclick="openApp('vn'); toggleStartMenu();"><span>🐝 Story</span></button>
+      <button class="desktop-icon-btn" onclick="openApp('care'); toggleStartMenu();"><span>🎟️ Coupons</span></button>
+      <button class="desktop-icon-btn" onclick="openApp('radio'); toggleStartMenu();"><span>📻 Radio</span></button>
+      <button class="desktop-icon-btn" onclick="openApp('notes'); toggleStartMenu();"><span>💌 Vault</span></button>
+    </div>
+    <div style="margin-top:16px; display:flex; justify-content:space-between;">
+      <button onclick="changeWallpaper()" style="font-size:12px; color:var(--gold);">🎨 Change Wallpaper</button>
+      <button onclick="lockOS()" style="font-size:12px; color:var(--pink);">🔒 Lock OS</button>
+    </div>
+  </div>
+
+  <!-- Taskbar -->
+  <footer class="taskbar">
+    <button class="start-btn" onclick="toggleStartMenu()"><span>🐝</span> Start</button>
+    <div class="taskbar-items" id="taskbarItems"></div>
+    <div class="sys-tray">
+      <span>🔋 100% Love</span>
+      <span id="sysClock">00:00 AM</span>
+    </div>
+  </footer>
+
+  <script>
+    /* ============================================================
+       SOUND ENGINE (Web Audio API Synthesizer)
+       ============================================================ */
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function initAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
+
+    function playTone(freq, duration, type='sine') {
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e){}
+    }
+
+    function soundClick() { playTone(600, 0.08, 'sine'); }
+    function soundUnlock() { playTone(400, 0.1); setTimeout(() => playTone(800, 0.2), 100); }
+    function soundWin() { playTone(523, 0.1); setTimeout(() => playTone(659, 0.1), 100); setTimeout(() => playTone(783, 0.2), 200); }
+
+    /* Lofi Synth Radio Engine */
+    let radioOsc = null, radioPlaying = false;
+    function toggleRadioPlay() {
+      initAudio();
+      const turntable = document.getElementById('turntable');
+      const btn = document.getElementById('radioPlayBtn');
+      if (!radioPlaying) {
+        radioPlaying = true;
+        turntable.classList.add('playing');
+        btn.innerText = '❚❚';
+        playLofiLoop();
+      } else {
+        radioPlaying = false;
+        turntable.classList.remove('playing');
+        btn.innerText = '▶';
+      }
+    }
+
+    function playLofiLoop() {
+      if (!radioPlaying) return;
+      const notes = [261.63, 329.63, 392.00, 493.88]; // C, E, G, B
+      const note = notes[Math.floor(Math.random() * notes.length)];
+      playTone(note, 0.6, 'triangle');
+      setTimeout(playLofiLoop, 800);
+    }
+
+    /* ============================================================
+       BACKGROUND CANVAS PARTICLES (Hearts & Bees)
+       ============================================================ */
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    for(let i=0; i<25; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 12 + 8,
+        speedY: Math.random() * 0.8 + 0.3,
+        symbol: Math.random() > 0.3 ? '💖' : '🐝'
+      });
+    }
+
+    function animCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.y -= p.speedY;
+        if(p.y < -30) p.y = canvas.height + 30;
+        ctx.font = `${p.size}px sans-serif`;
+        ctx.fillText(p.symbol, p.x, p.y);
+      });
+      requestAnimationFrame(animCanvas);
+    }
+    animCanvas();
+
+    /* ============================================================
+       BOOT & LOCK SCREEN LOGIC
+       ============================================================ */
+    let bootFill = document.getElementById('bootFill');
+    let bootStatus = document.getElementById('bootStatus');
+    let bootPct = 0;
+
+    let bootInterval = setInterval(() => {
+      bootPct += 15;
+      bootFill.style.width = bootPct + '%';
+      if(bootPct === 30) bootStatus.innerText = 'Loading Ray & Bee memory database...';
+      if(bootPct === 70) bootStatus.innerText = 'Unlocking 1000% love encryption...';
+      if(bootPct >= 100) {
+        clearInterval(bootInterval);
+        document.getElementById('bootScreen').classList.add('is-hidden');
+      }
+    }, 200);
+
+    let enteredPin = '';
+    function pressPin(val) {
+      soundClick();
+      if(val === 'C') enteredPin = '';
+      else if(val === '←') enteredPin = enteredPin.slice(0, -1);
+      else if(enteredPin.length < 4) enteredPin += val;
+
+      for(let i=0; i<4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if(i < enteredPin.length) dot.classList.add('filled');
+        else dot.classList.remove('filled');
+      }
+
+      if(enteredPin.length === 4) {
+        if(enteredPin === '1204' || enteredPin === '0000') unlockHeart();
+        else {
+          alert('Incorrect PIN! Hint: 1204');
+          enteredPin = '';
+          pressPin('');
+        }
+      }
+    }
+
+    function unlockHeart() {
+      soundUnlock();
+      document.getElementById('lockScreen').classList.add('unlocked');
+    }
+
+    function lockOS() {
+      enteredPin = '';
+      pressPin('');
+      document.getElementById('lockScreen').classList.remove('unlocked');
+      toggleStartMenu();
+    }
+
+    /* ============================================================
+       WINDOW MANAGER & APPS
+       ============================================================ */
+    let activeApps = new Set();
+    let topZ = 100;
+
+    function openApp(id) {
+      soundClick();
+      const win = document.getElementById(`win-${id}`);
+      if (!win) return;
+      win.classList.add('is-open', 'is-active');
+      win.classList.remove('is-minimized');
+      topZ++;
+      win.style.zIndex = topZ;
+      activeApps.add(id);
+      renderTaskbar();
+    }
+
+    function closeApp(id) {
+      soundClick();
+      const win = document.getElementById(`win-${id}`);
+      if (win) win.classList.remove('is-open', 'is-active');
+      activeApps.delete(id);
+      renderTaskbar();
+    }
+
+    function minimizeApp(id) {
+      soundClick();
+      const win = document.getElementById(`win-${id}`);
+      if (win) win.classList.add('is-minimized');
+      renderTaskbar();
+    }
+
+    function toggleMaximize(id) {
+      soundClick();
+      const win = document.getElementById(`win-${id}`);
+      if (win) win.classList.toggle('is-maximized');
+    }
+
+    function renderTaskbar() {
+      const container = document.getElementById('taskbarItems');
+      container.innerHTML = '';
+      activeApps.forEach(id => {
+        const btn = document.createElement('button');
+        btn.className = 'taskbar-item active';
+        btn.innerText = id.toUpperCase();
+        btn.onclick = () => openApp(id);
+        container.appendChild(btn);
+      });
+    }
+
+    function toggleStartMenu() {
+      soundClick();
+      document.getElementById('startMenu').classList.toggle('is-open');
+    }
+
+    const wallpapers = ['wallpaper-sunset', 'wallpaper-rose', 'wallpaper-night', 'wallpaper-honey'];
+    let wpIdx = 0;
+    function changeWallpaper() {
+      wpIdx = (wpIdx + 1) % wallpapers.length;
+      document.body.className = wallpapers[wpIdx];
+    }
+
+    /* ============================================================
+       VISUAL NOVEL ENGINE
+       ============================================================ */
+    const vnScript = [
+      { name: 'Ray', text: 'Hey Bee... Do you know what today is?', bg: 'linear-gradient(to bottom, #4a1942, #000)' },
+      { name: 'Bee', text: 'Hmm? Another day of you annoying me? 😜' },
+      { name: 'Ray', text: 'Nope! It is the day I built you your very own Operating System!' },
+      { name: 'Bee', text: 'Wait, really?! A whole OS just for me?!' },
+      { choices: [
+          { text: 'I love it so much! 💖', next: 4 },
+          { text: 'You are the best boyfriend ever! 🥰', next: 4 }
+        ]
+      },
+      { name: 'Ray', text: 'I love you to the moon and back, Bee! Enjoy RayBee OS!' }
+    ];
+    let vnIdx = 0;
+
+    function renderVnStep() {
+      const step = vnScript[vnIdx];
+      const choicesEl = document.getElementById('vnChoices');
+      if (step.choices) {
+        choicesEl.style.display = 'flex';
+        choicesEl.innerHTML = '';
+        step.choices.forEach(c => {
+          const btn = document.createElement('button');
+          btn.className = 'vn-choice-btn';
+          btn.innerText = c.text;
+          btn.onclick = () => {
+            choicesEl.style.display = 'none';
+            vnIdx = c.next;
+            renderVnStep();
+          };
+          choicesEl.appendChild(btn);
+        });
+      } else {
+        choicesEl.style.display = 'none';
+        document.getElementById('vnName').innerText = step.name;
+        document.getElementById('vnText').innerText = step.text;
+      }
+    }
+    function nextVnDialogue() {
+      if (vnIdx < vnScript.length - 1 && !vnScript[vnIdx].choices) {
+        vnIdx++;
+        renderVnStep();
+      }
+    }
+    renderVnStep();
+
+    /* ============================================================
+       SIGNAL CHAT SIMULATOR
+       ============================================================ */
+    function handleChatKey(e) { if(e.key === 'Enter') sendChatMessage(); }
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if(!text) return;
+      const msgs = document.getElementById('chatMsgs');
+      
+      const sentMsg = document.createElement('div');
+      sentMsg.className = 'chat-msg sent';
+      sentMsg.innerText = text;
+      msgs.appendChild(sentMsg);
+      input.value = '';
+
+      setTimeout(() => {
+        const replyMsg = document.createElement('div');
+        replyMsg.className = 'chat-msg received';
+        replyMsg.innerText = "Aww! Ray says: " + text + " 💖 (I love you!)";
+        msgs.appendChild(replyMsg);
+        msgs.scrollTop = msgs.scrollHeight;
+      }, 1000);
+    }
+
+    /* ============================================================
+       HONEY VAULT & REASONS
+       ============================================================ */
+    const reasons = [
+      "Your smile lights up my whole world.",
+      "The cute laugh you make when you are happy.",
+      "How caring and sweet you always are.",
+      "Our late night conversations & laughs.",
+      "You make me the luckiest person alive!"
+    ];
+    const grid = document.getElementById('reasonsGrid');
+    reasons.forEach((r, i) => {
+      const card = document.createElement('div');
+      card.className = 'reason-card';
+      card.innerText = `#${i+1}: ${r}`;
+      grid.appendChild(card);
+    });
+
+    function switchNoteTab(tab) {
+      if(tab === 'reasons') {
+        document.getElementById('reasonsGrid').style.display = 'grid';
+        document.getElementById('lettersView').style.display = 'none';
+      } else {
+        document.getElementById('reasonsGrid').style.display = 'none';
+        document.getElementById('lettersView').style.display = 'block';
+      }
+    }
+
+    /* ============================================================
+       LOVE COUPONS LOGIC
+       ============================================================ */
+    const couponsData = [
+      { id: 1, title: 'Unlimited Massage', desc: '1-hour back & shoulder massage by Ray' },
+      { id: 2, title: 'Boba Date on Demand', desc: 'Ray buys your favorite boba tea!' },
+      { id: 3, title: 'Movie Night Pick', desc: 'You pick the movie & snacks, no complaints!' },
+      { id: 4, title: 'Instant Win Argument', desc: 'Use this to instantly win any friendly argument!' }
+    ];
+    const couponsGrid = document.getElementById('couponsGrid');
+    couponsData.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'coupon-card';
+      el.id = `coupon-${c.id}`;
+      el.innerHTML = `
+        <div class="coupon-stamp">REDEEMED</div>
+        <div class="coupon-icon">🎟️</div>
+        <div class="coupon-title">${c.title}</div>
+        <div class="coupon-desc">${c.desc}</div>
+        <button class="redeem-btn" onclick="redeemCoupon(${c.id})">Redeem Coupon</button>
+      `;
+      couponsGrid.appendChild(el);
+    });
+
+    function redeemCoupon(id) {
+      soundWin();
+      document.getElementById(`coupon-${id}`).classList.add('redeemed');
+    }
+
+    /* ============================================================
+       DESSERT CAFE MINI-GAME
+       ============================================================ */
+    let cupLevel = 0;
+    function addIngredient(name, color, pct) {
+      soundClick();
+      cupLevel = Math.min(100, pct);
+      document.getElementById('cupFill').style.height = cupLevel + '%';
+      document.getElementById('cupFill').style.background = color;
+    }
+    function serveDrink() {
+      if(cupLevel >= 66) {
+        soundWin();
+        alert('Delicious! Ray loves the drink you made! 🧋💖');
+      } else alert('Add more ingredients first!');
+    }
+
+    /* ============================================================
+       POLAROID GALLERY
+       ============================================================ */
+    const photos = [
+      { title: 'First Date' },
+      { title: 'Sunset Walks' },
+      { title: 'Boba Time' }
+    ];
+    const galGrid = document.getElementById('galleryGrid');
+    photos.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'polaroid';
+      card.innerHTML = `
+        <div class="polaroid-img" style="display:grid; place-items:center; font-size:40px;">📸</div>
+        <div class="polaroid-caption">${p.title}</div>
+      `;
+      galGrid.appendChild(card);
+    });
+
+    /* ============================================================
+       BEE TERMINAL
+       ============================================================ */
+    function handleTermKey(e) { if(e.key === 'Enter') runCommand(); }
+    function runCommand() {
+      const input = document.getElementById('termInput');
+      const cmd = input.value.trim().toLowerCase();
+      const out = document.getElementById('termOutput');
+      
+      const line = document.createElement('div');
+      line.className = 'term-line';
+      line.innerText = `bee@ray:~$ ${cmd}`;
+      out.insertBefore(line, input.parentElement);
+      
+      const res = document.createElement('div');
+      res.className = 'term-line';
+      if(cmd === 'help') res.innerText = "Commands: help, love, kiss, clear";
+      else if(cmd === 'love') res.innerText = "Love Level: OVER 9000%! 💖";
+      else if(cmd === 'kiss') res.innerText = "💋 Smooch sent to Bee!";
+      else if(cmd === 'clear') { out.innerHTML = ''; out.appendChild(input.parentElement); }
+      else res.innerText = "Command not found. Type 'help'.";
+      
+      out.insertBefore(res, input.parentElement);
+      input.value = '';
+    }
+
+    /* ============================================================
+       WIDGETS & TIMERS
+       ============================================================ */
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('sysClock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function updateLoveTimer() {
+      document.getElementById('loveTimer').innerText = "1314d 05h 20m";
+    }
+    updateLoveTimer();
+
+    function buzzClick() {
+      soundClick();
+      const bubble = document.getElementById('buzzBubble');
+      bubble.classList.add('show');
+      setTimeout(() => bubble.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>
