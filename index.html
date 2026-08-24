@@ -1556,6 +1556,17 @@
       cursor: pointer;
     }
 
+    .product.is-selected {
+      border-color: #d9447b;
+      box-shadow: inset 0 0 0 1px rgba(217, 68, 123, 0.18);
+    }
+
+    .product-add[aria-pressed="true"] {
+      border-color: #b93468;
+      background: #b93468;
+      color: #fff;
+    }
+
     .cart-panel {
       min-height: 0;
       display: flex;
@@ -1568,6 +1579,19 @@
     .cart-panel h3 {
       margin: 0 0 7px;
       font: 700 24px/1 Georgia, serif;
+    }
+
+    .cart-count {
+      min-width: 22px;
+      height: 22px;
+      display: inline-grid;
+      place-items: center;
+      margin-left: 5px;
+      border-radius: 50%;
+      background: #b93468;
+      color: #fff;
+      font: 800 11px/1 Inter, "Segoe UI", Arial, sans-serif;
+      vertical-align: 3px;
     }
 
     .cart-panel > p {
@@ -1618,6 +1642,13 @@
       color: #fff;
       font-weight: 850;
       cursor: pointer;
+    }
+
+    .delivery-button:disabled {
+      border-color: #bbaeb4;
+      background: #bbaeb4;
+      cursor: default;
+      opacity: 0.78;
     }
 
     /* Notes */
@@ -2215,11 +2246,14 @@
 
       .wallpaper-character {
         display: block;
-        right: 10px;
+        left: 50%;
+        right: auto;
         bottom: 0;
-        width: min(80vw, 330px);
+        width: min(76vw, 330px);
         max-height: 63%;
-        opacity: 0.7;
+        transform: translateX(-50%);
+        object-position: bottom center;
+        opacity: 0.68;
         filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.3));
       }
 
@@ -2446,21 +2480,158 @@
       }
 
       .lotus-app {
-        height: auto;
-        min-height: 100%;
+        height: 100%;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
         padding-bottom: 0;
       }
 
+      #window-lotus .window-body {
+        overflow: hidden;
+      }
+
       .shop-area {
-        padding: 20px 14px;
+        order: 2;
+        min-height: 0;
+        flex: 1;
+        padding: 14px;
+        overflow: auto;
+      }
+
+      .shop-heading {
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .shop-heading h2 {
+        font-size: 24px;
+      }
+
+      .shop-heading p {
+        display: none;
+      }
+
+      .shop-badge {
+        font-size: 10px;
       }
 
       .product-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .product {
+        min-height: 142px;
+        padding: 12px;
+      }
+
+      .product-icon {
+        font-size: 25px;
+      }
+
+      .product strong {
+        margin-top: 8px;
+        font-size: 15px;
+      }
+
+      .product small {
+        display: -webkit-box;
+        margin: 4px 0 9px;
+        overflow: hidden;
+        font-size: 10px;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      .product-add {
+        min-height: 44px;
       }
 
       .cart-panel {
-        min-height: 310px;
+        order: 1;
+        z-index: 3;
+        min-height: 0;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(132px, 42%);
+        grid-template-areas:
+          "cart-title cart-action"
+          "cart-items cart-action";
+        gap: 6px 10px;
+        flex: 0 0 auto;
+        padding: 11px 14px;
+        border-bottom: 1px solid #d8c8cf;
+        background: rgba(241, 231, 229, 0.97);
+        box-shadow: 0 8px 20px rgba(64, 39, 52, 0.1);
+      }
+
+      .cart-panel h3 {
+        grid-area: cart-title;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin: 0;
+        font-size: 17px;
+        white-space: nowrap;
+      }
+
+      .cart-panel .cart-count {
+        flex: 0 0 22px;
+        margin-left: 0;
+        vertical-align: 0;
+      }
+
+      .cart-panel > p {
+        display: none;
+      }
+
+      .cart-items {
+        grid-area: cart-items;
+        min-height: 24px;
+        max-height: 42px;
+        flex-direction: row;
+        align-items: center;
+        gap: 5px;
+        overflow: auto hidden;
+      }
+
+      .cart-empty {
+        padding: 0;
+        font-size: 12px;
+        text-align: left;
+        white-space: nowrap;
+      }
+
+      .cart-item {
+        max-width: 150px;
+        flex: 0 0 auto;
+        align-items: center;
+        padding: 3px 4px;
+        border: 1px solid #d8c8cf;
+        border-radius: 5px;
+        background: #fffaf7;
+        font-size: 10px;
+      }
+
+      .cart-item span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .cart-item button {
+        width: 24px;
+        height: 24px;
+      }
+
+      .delivery-button {
+        grid-area: cart-action;
+        min-width: 0;
+        min-height: 54px;
+        padding: 7px 9px;
+        line-height: 1.2;
       }
 
       .note-list {
@@ -2548,15 +2719,12 @@
       }
 
       .wallpaper-character {
-        right: 4px;
-        width: min(74vw, 235px);
-        max-height: 58%;
-        opacity: 0.58;
-      }
-
-      .wallpaper-character {
-        right: -32px;
-        max-height: 47%;
+        left: 50%;
+        right: auto;
+        width: min(72vw, 245px);
+        max-height: 49%;
+        transform: translateX(-50%);
+        opacity: 0.62;
       }
 
       .wallpaper-people {
@@ -2567,12 +2735,12 @@
       }
 
       .product-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .shop-heading {
-        align-items: start;
-        flex-direction: column;
+        align-items: center;
+        flex-direction: row;
       }
     }
 
@@ -2795,7 +2963,7 @@
             <div class="product-grid" id="productGrid"></div>
           </section>
           <aside class="cart-panel">
-            <h3>Qwarra's order</h3>
+            <h3>Qwarra's order <span class="cart-count" id="cartCount">0</span></h3>
             <p>Payment method: one enthusiastic “THANK!”</p>
             <div class="cart-items" id="cartItems"></div>
             <button class="delivery-button" id="deliveryButton" type="button">Send request on WhatsApp</button>
@@ -3464,17 +3632,30 @@
       // Lotus delivery
       const productGrid = document.getElementById('productGrid');
       const cartItems = document.getElementById('cartItems');
+      const cartCount = document.getElementById('cartCount');
+      const deliveryButton = document.getElementById('deliveryButton');
       products.forEach(product => {
         const article = document.createElement('article');
         article.className = 'product';
-        article.innerHTML = `<span class="product-icon" aria-hidden="true">${product.icon}</span><strong>${escapeHtml(product.name)}</strong><small>${escapeHtml(product.note)}</small><button class="product-add" type="button">Add request</button>`;
+        article.dataset.productId = product.id;
+        article.innerHTML = `<span class="product-icon" aria-hidden="true">${product.icon}</span><strong>${escapeHtml(product.name)}</strong><small>${escapeHtml(product.note)}</small><button class="product-add" type="button" data-product-id="${product.id}" aria-pressed="false">Add request</button>`;
         article.querySelector('button').addEventListener('click', () => {
-          if (!cart.includes(product.id)) cart.push(product.id);
+          cart = cart.includes(product.id) ? cart.filter(id => id !== product.id) : [...cart, product.id];
           renderCart();
         });
         productGrid.appendChild(article);
       });
       function renderCart() {
+        cartCount.textContent = String(cart.length);
+        deliveryButton.disabled = cart.length === 0;
+        deliveryButton.textContent = cart.length ? `Send ${cart.length} via WhatsApp` : 'Choose an item';
+        productGrid.querySelectorAll('.product').forEach(article => {
+          const selected = cart.includes(article.dataset.productId);
+          article.classList.toggle('is-selected', selected);
+          const button = article.querySelector('.product-add');
+          button.setAttribute('aria-pressed', String(selected));
+          button.textContent = selected ? 'Added · remove' : 'Add request';
+        });
         if (!cart.length) {
           cartItems.innerHTML = '<div class="cart-empty">The sibling cloud is waiting.</div>';
           return;
@@ -3489,7 +3670,7 @@
         }));
       }
       renderCart();
-      document.getElementById('deliveryButton').addEventListener('click', () => {
+      deliveryButton.addEventListener('click', () => {
         if (!cart.length) {
           notify('Order empty', 'Add the usual one first.', '🍨');
           return;
