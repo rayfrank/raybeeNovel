@@ -190,79 +190,40 @@
       position: absolute;
       inset: 0 0 var(--taskbar-h);
       overflow: hidden;
-      background: #21151d;
+      background: #23171f;
+      isolation: isolate;
     }
 
     .wallpaper::before {
       content: "";
       position: absolute;
-      z-index: 1;
-      inset: 0;
-      background: rgba(25, 13, 20, 0.62);
-      box-shadow: inset 0 0 150px rgba(13, 7, 11, 0.48);
+      z-index: 0;
+      top: -12%;
+      right: 9%;
+      width: 43vw;
+      min-width: 470px;
+      height: 126%;
+      transform: rotate(6deg);
+      border: 1px solid rgba(246, 161, 185, 0.28);
+      background: #5b273f;
+      box-shadow: 26px 0 0 rgba(237, 95, 145, 0.12), inset 1px 0 0 rgba(255, 255, 255, 0.12);
       pointer-events: none;
     }
 
     .wallpaper::after {
       content: "";
       position: absolute;
-      z-index: 4;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 1px;
-      background: rgba(255, 255, 255, 0.28);
+      z-index: 1;
+      right: -4%;
+      bottom: -13%;
+      width: 35vw;
+      min-width: 390px;
+      height: 68%;
+      transform: rotate(-5deg);
+      border: 1px solid rgba(158, 205, 189, 0.28);
+      background: #2c4039;
+      box-shadow: -20px -20px 0 rgba(158, 205, 189, 0.08);
       pointer-events: none;
-    }
-
-    .wallpaper-memory-bg {
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center 40%;
-      opacity: 0.82;
-      filter: saturate(0.86) contrast(1.06);
-      transform: scale(1.015);
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .wallpaper-memory-rail {
-      position: absolute;
-      z-index: 2;
-      left: clamp(196px, 19vw, 312px);
-      bottom: clamp(22px, 4vh, 42px);
-      width: min(43vw, 610px);
-      height: clamp(104px, 17vh, 150px);
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 10px;
-      padding: 10px;
-      border: 1px solid var(--glass-line);
-      border-radius: 8px;
-      background: rgba(24, 16, 21, 0.36);
-      box-shadow: 0 20px 48px rgba(13, 7, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      -webkit-backdrop-filter: blur(18px) saturate(135%);
-      backdrop-filter: blur(18px) saturate(135%);
-    }
-
-    .wallpaper-memory {
-      width: 100%;
-      height: 100%;
-      min-width: 0;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: 6px;
-      background: rgba(18, 12, 16, 0.58);
-      object-fit: cover;
-    }
-
-    .wallpaper-memory.portraits {
-      object-fit: contain;
-      background: rgba(15, 11, 14, 0.82);
     }
 
     .wallpaper-copy {
@@ -315,10 +276,10 @@
     .wallpaper-character {
       position: absolute;
       z-index: 3;
-      right: clamp(15px, 4vw, 70px);
+      right: clamp(22px, 5vw, 84px);
       bottom: -2px;
-      width: min(33vw, 450px);
-      max-height: 91%;
+      width: min(38vw, 520px);
+      max-height: 94%;
       object-fit: contain;
       object-position: bottom right;
       filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.28));
@@ -2169,22 +2130,19 @@
       }
 
       .wallpaper::before {
-        inset: 0;
-        width: auto;
+        inset: 4% -28% 4% auto;
+        width: 82vw;
+        min-width: 0;
+        height: auto;
+        transform: rotate(5deg);
       }
 
       .wallpaper::after {
-        width: auto;
-      }
-
-      .wallpaper-memory-bg {
-        object-position: 15% center;
-        opacity: 0.74;
-        transform: scale(1.03);
-      }
-
-      .wallpaper-memory-rail {
-        display: none;
+        inset: auto -24% -12% auto;
+        width: 74vw;
+        min-width: 0;
+        height: 54%;
+        transform: rotate(-5deg);
       }
 
       .wallpaper-copy {
@@ -2207,7 +2165,13 @@
       }
 
       .wallpaper-character {
-        display: none;
+        display: block;
+        right: 10px;
+        bottom: 0;
+        width: min(80vw, 330px);
+        max-height: 63%;
+        opacity: 0.7;
+        filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.3));
       }
 
       .desktop-icons {
@@ -2513,6 +2477,18 @@
         font-size: 48px;
       }
 
+      .wallpaper-character {
+        right: 4px;
+        width: min(74vw, 235px);
+        max-height: 58%;
+        opacity: 0.58;
+      }
+
+      .wallpaper-character {
+        right: -32px;
+        max-height: 47%;
+      }
+
       .product-grid {
         grid-template-columns: 1fr;
       }
@@ -2588,11 +2564,6 @@
 
   <main class="desktop" id="desktop">
     <section class="wallpaper" aria-label="QwarraOS wallpaper">
-      <img class="wallpaper-memory-bg" data-photo-source="Qwarra with family and friends" alt="" aria-hidden="true">
-      <div class="wallpaper-memory-rail" aria-hidden="true">
-        <img class="wallpaper-memory" data-photo-source="Qwarra with Ray, Bee, Mike and Mell at the cinema" alt="">
-        <img class="wallpaper-memory portraits" data-photo-source="Three portraits of Qwarra" alt="">
-      </div>
       <div class="wallpaper-copy">
         <p class="wallpaper-kicker">Sibling edition · connected since 2004</p>
         <h1 class="wallpaper-title">Qwarra<span>OS</span></h1>
@@ -2982,11 +2953,6 @@
       const musicToggle = document.getElementById('musicToggle');
       const spotifyPlayer = document.getElementById('spotifyPlayer');
       const spotifyPanelToggle = document.getElementById('spotifyPanelToggle');
-
-      document.querySelectorAll('[data-photo-source]').forEach(target => {
-        const source = Array.from(document.images).find(image => image.alt === target.dataset.photoSource && image.src);
-        if (source) target.src = source.src;
-      });
 
       const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
 
