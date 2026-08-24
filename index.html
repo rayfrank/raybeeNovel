@@ -20,7 +20,11 @@
       --mint: #9ecdbd;
       --gold: #e8bd6a;
       --line: rgba(255, 255, 255, 0.16);
-      --shadow: 0 18px 48px rgba(20, 10, 16, 0.28);
+      --glass-light: rgba(255, 249, 247, 0.76);
+      --glass-light-strong: rgba(255, 250, 248, 0.9);
+      --glass-dark: rgba(24, 17, 22, 0.7);
+      --glass-line: rgba(255, 255, 255, 0.38);
+      --shadow: 0 22px 64px rgba(20, 10, 16, 0.34), 0 2px 10px rgba(20, 10, 16, 0.18);
       --taskbar-h: 58px;
       color-scheme: dark;
       font-family: Inter, "Segoe UI", Arial, sans-serif;
@@ -38,6 +42,7 @@
       height: 100%;
       margin: 0;
       overflow: hidden;
+      overscroll-behavior: none;
       background: var(--shell);
     }
 
@@ -174,6 +179,7 @@
     .desktop {
       position: relative;
       width: 100%;
+      height: 100vh;
       height: 100dvh;
       overflow: hidden;
       background: #261820;
@@ -184,38 +190,84 @@
       position: absolute;
       inset: 0 0 var(--taskbar-h);
       overflow: hidden;
-      background: #2b1a23;
+      background: #21151d;
     }
 
     .wallpaper::before {
       content: "";
       position: absolute;
-      width: 44vw;
-      min-width: 420px;
-      height: 130%;
-      top: -15%;
-      right: 8%;
-      transform: rotate(10deg);
-      background: #482533;
-      border-left: 2px solid rgba(246, 161, 185, 0.24);
+      z-index: 1;
+      inset: 0;
+      background: rgba(25, 13, 20, 0.62);
+      box-shadow: inset 0 0 150px rgba(13, 7, 11, 0.48);
+      pointer-events: none;
     }
 
     .wallpaper::after {
       content: "";
       position: absolute;
-      width: 30vw;
-      min-width: 310px;
-      height: 76%;
-      right: -5%;
-      bottom: -12%;
-      transform: rotate(-8deg);
-      background: #2b3330;
-      border: 2px solid rgba(158, 205, 189, 0.2);
+      z-index: 4;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.28);
+      pointer-events: none;
+    }
+
+    .wallpaper-memory-bg {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 40%;
+      opacity: 0.82;
+      filter: saturate(0.86) contrast(1.06);
+      transform: scale(1.015);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .wallpaper-memory-rail {
+      position: absolute;
+      z-index: 2;
+      left: clamp(196px, 19vw, 312px);
+      bottom: clamp(22px, 4vh, 42px);
+      width: min(43vw, 610px);
+      height: clamp(104px, 17vh, 150px);
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid var(--glass-line);
+      border-radius: 8px;
+      background: rgba(24, 16, 21, 0.36);
+      box-shadow: 0 20px 48px rgba(13, 7, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      -webkit-backdrop-filter: blur(18px) saturate(135%);
+      backdrop-filter: blur(18px) saturate(135%);
+    }
+
+    .wallpaper-memory {
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+      background: rgba(18, 12, 16, 0.58);
+      object-fit: cover;
+    }
+
+    .wallpaper-memory.portraits {
+      object-fit: contain;
+      background: rgba(15, 11, 14, 0.82);
     }
 
     .wallpaper-copy {
       position: absolute;
-      z-index: 1;
+      z-index: 4;
       left: clamp(170px, 17vw, 300px);
       top: clamp(74px, 14vh, 150px);
       max-width: min(47vw, 650px);
@@ -262,7 +314,7 @@
 
     .wallpaper-character {
       position: absolute;
-      z-index: 2;
+      z-index: 3;
       right: clamp(15px, 4vw, 70px);
       bottom: -2px;
       width: min(33vw, 450px);
@@ -295,12 +347,15 @@
       justify-content: flex-start;
       gap: 7px;
       padding: 5px 3px;
-      border: 1px solid transparent;
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 6px;
-      background: transparent;
+      background: rgba(21, 14, 19, 0.34);
       color: #fff;
       cursor: pointer;
       text-shadow: 0 2px 8px #000;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13);
+      -webkit-backdrop-filter: blur(12px) saturate(135%);
+      backdrop-filter: blur(12px) saturate(135%);
     }
 
     .desktop-icon:hover,
@@ -358,8 +413,11 @@
       gap: 8px;
       padding: 7px 12px max(7px, env(safe-area-inset-bottom));
       border-top: 1px solid var(--line);
-      background: #191419;
+      background: var(--glass-dark);
       color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 -14px 32px rgba(14, 8, 12, 0.18);
+      -webkit-backdrop-filter: blur(26px) saturate(150%);
+      backdrop-filter: blur(26px) saturate(150%);
     }
 
     .start-button,
@@ -448,8 +506,10 @@
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
-      background: #181315;
+      background: rgba(24, 18, 22, 0.72);
       box-shadow: 0 16px 42px rgba(15, 8, 12, 0.34);
+      -webkit-backdrop-filter: blur(24px) saturate(150%);
+      backdrop-filter: blur(24px) saturate(150%);
       transition: width 180ms ease;
     }
 
@@ -620,9 +680,11 @@
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 8px;
-      background: #231b21;
+      background: rgba(30, 21, 27, 0.76);
       color: #fff;
       box-shadow: var(--shadow);
+      -webkit-backdrop-filter: blur(28px) saturate(150%);
+      backdrop-filter: blur(28px) saturate(150%);
     }
 
     .start-menu.is-open {
@@ -643,7 +705,7 @@
       gap: 14px;
       padding: 17px;
       border-bottom: 1px solid var(--line);
-      background: #35252e;
+      background: rgba(255, 255, 255, 0.07);
     }
 
     .start-avatar {
@@ -698,7 +760,7 @@
 
     .start-app:hover {
       border-color: var(--line);
-      background: #352a31;
+      background: rgba(255, 255, 255, 0.11);
     }
 
     .start-footer {
@@ -741,9 +803,21 @@
       transform: translate(-50%, -50%);
       border: 1px solid rgba(255, 255, 255, 0.22);
       border-radius: 8px;
-      background: var(--paper);
+      background: var(--glass-light);
       color: var(--ink);
       box-shadow: var(--shadow);
+      -webkit-backdrop-filter: blur(30px) saturate(150%);
+      backdrop-filter: blur(30px) saturate(150%);
+    }
+
+    .app-window::after {
+      content: "";
+      position: absolute;
+      z-index: 20;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.84), inset 1px 0 0 rgba(255, 255, 255, 0.36), inset -1px 0 0 rgba(255, 255, 255, 0.18);
+      pointer-events: none;
     }
 
     .app-window.is-open {
@@ -787,8 +861,11 @@
       gap: 10px;
       flex: 0 0 48px;
       padding: 0 8px 0 13px;
-      border-bottom: 1px solid #ded3d9;
-      background: #fffdfb;
+      border-bottom: 1px solid rgba(125, 93, 109, 0.2);
+      background: rgba(255, 252, 250, 0.68);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+      -webkit-backdrop-filter: blur(22px) saturate(145%);
+      backdrop-filter: blur(22px) saturate(145%);
       user-select: none;
       touch-action: none;
       cursor: move;
@@ -834,7 +911,7 @@
       place-items: center;
       border: 1px solid transparent;
       border-radius: 5px;
-      background: transparent;
+      background: rgba(255, 255, 255, 0.16);
       color: #4d4349;
       font-size: 17px;
       line-height: 1;
@@ -857,13 +934,15 @@
       min-height: 0;
       flex: 1;
       overflow: auto;
-      background: var(--paper);
+      background: rgba(255, 249, 245, 0.74);
       scrollbar-color: #c4aeb8 transparent;
       scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
     .window-body.dark {
-      background: #171317;
+      background: rgba(20, 15, 19, 0.91);
       color: #f7edf2;
     }
 
@@ -873,8 +952,10 @@
       align-items: center;
       gap: 8px;
       padding: 8px 16px;
-      border-bottom: 1px solid #e4d9de;
-      background: #f7f0ed;
+      border-bottom: 1px solid rgba(125, 93, 109, 0.18);
+      background: rgba(250, 242, 239, 0.72);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      backdrop-filter: blur(18px) saturate(140%);
     }
 
     .toolbar-spacer {
@@ -2036,9 +2117,11 @@
       padding: 10px 12px;
       border: 1px solid rgba(255, 255, 255, 0.19);
       border-radius: 8px;
-      background: #251d23;
+      background: rgba(37, 29, 35, 0.78);
       color: #fff;
       box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+      -webkit-backdrop-filter: blur(20px) saturate(145%);
+      backdrop-filter: blur(20px) saturate(145%);
       animation: toast-in 220ms ease-out;
     }
 
@@ -2086,14 +2169,22 @@
       }
 
       .wallpaper::before {
-        width: 80vw;
-        min-width: 0;
-        right: -20%;
+        inset: 0;
+        width: auto;
       }
 
       .wallpaper::after {
-        width: 65vw;
-        min-width: 0;
+        width: auto;
+      }
+
+      .wallpaper-memory-bg {
+        object-position: 15% center;
+        opacity: 0.74;
+        transform: scale(1.03);
+      }
+
+      .wallpaper-memory-rail {
+        display: none;
       }
 
       .wallpaper-copy {
@@ -2116,20 +2207,20 @@
       }
 
       .wallpaper-character {
-        width: min(64vw, 320px);
-        right: -26px;
-        max-height: 56%;
-        opacity: 0.72;
+        display: none;
       }
 
       .desktop-icons {
-        top: 178px;
-        left: 10px;
-        right: 10px;
+        top: 156px;
+        left: max(10px, env(safe-area-inset-left));
+        right: max(10px, env(safe-area-inset-right));
         width: auto;
+        max-height: calc(100dvh - var(--taskbar-h) - 166px);
         grid-template-columns: repeat(4, minmax(0, 1fr));
         grid-auto-rows: 86px;
         gap: 5px 2px;
+        overflow: auto;
+        overscroll-behavior: contain;
       }
 
       .desktop-icon {
@@ -2137,6 +2228,7 @@
         height: 86px;
         gap: 5px;
         padding: 3px 1px;
+        touch-action: manipulation;
       }
 
       .app-icon {
@@ -2224,6 +2316,9 @@
         transform: none;
         border: 0;
         border-radius: 0;
+        background: rgba(255, 249, 247, 0.94);
+        -webkit-backdrop-filter: blur(28px) saturate(145%);
+        backdrop-filter: blur(28px) saturate(145%);
       }
 
       .app-window.is-open {
@@ -2249,8 +2344,17 @@
       }
 
       .window-control.close {
-        width: 42px;
-        height: 38px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .window-body {
+        padding-right: env(safe-area-inset-right);
+        padding-left: env(safe-area-inset-left);
+      }
+
+      .window-body.dark {
+        background: rgba(20, 15, 19, 0.96);
       }
 
       .signal-app,
@@ -2402,7 +2506,7 @@
     @media (max-width: 390px) {
       .desktop-icons {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        top: 160px;
+        top: 148px;
       }
 
       .wallpaper-title {
@@ -2484,6 +2588,11 @@
 
   <main class="desktop" id="desktop">
     <section class="wallpaper" aria-label="QwarraOS wallpaper">
+      <img class="wallpaper-memory-bg" data-photo-source="Qwarra with family and friends" alt="" aria-hidden="true">
+      <div class="wallpaper-memory-rail" aria-hidden="true">
+        <img class="wallpaper-memory" data-photo-source="Qwarra with Ray, Bee, Mike and Mell at the cinema" alt="">
+        <img class="wallpaper-memory portraits" data-photo-source="Three portraits of Qwarra" alt="">
+      </div>
       <div class="wallpaper-copy">
         <p class="wallpaper-kicker">Sibling edition · connected since 2004</p>
         <h1 class="wallpaper-title">Qwarra<span>OS</span></h1>
@@ -2873,6 +2982,11 @@
       const musicToggle = document.getElementById('musicToggle');
       const spotifyPlayer = document.getElementById('spotifyPlayer');
       const spotifyPanelToggle = document.getElementById('spotifyPanelToggle');
+
+      document.querySelectorAll('[data-photo-source]').forEach(target => {
+        const source = Array.from(document.images).find(image => image.alt === target.dataset.photoSource && image.src);
+        if (source) target.src = source.src;
+      });
 
       const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
 
